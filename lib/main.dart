@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:striv/onboarding/splash/splash.dart';
 import 'package:striv/utils/app_palette.dart';
 import 'package:striv/pages/navigation.dart';
 
@@ -29,26 +28,7 @@ class StrivApp extends StatelessWidget {
         fontFamily: "Poppins",
         scaffoldBackgroundColor: AppPalette.primaryBackground,
       ),
-      home: GradientScaffold(child: SplashScreen()),
-    );
-  }
-}
-
-class GradientScaffold extends StatelessWidget {
-  final Widget child;
-  const GradientScaffold({super.key, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color.fromARGB(255, 211, 161, 178), Colors.white],
-        ),
-      ),
-      child: Scaffold(backgroundColor: Colors.transparent, body: child),
+      home: Navigation(),
     );
   }
 }

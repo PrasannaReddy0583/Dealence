@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:striv/pages/chat_conversations_page.dart';
 import 'package:striv/utils/app_palette.dart';
 
 class ChatTile extends StatelessWidget {
@@ -7,8 +9,8 @@ class ChatTile extends StatelessWidget {
   final String message;
   final String time;
   final int unread;
+  final bool isHighlighted;
   final String avatar;
-  final VoidCallback? onTap;
 
   const ChatTile({
     super.key,
@@ -17,29 +19,39 @@ class ChatTile extends StatelessWidget {
     required this.message,
     required this.time,
     required this.avatar,
-    this.onTap,
     this.unread = 0,
+    this.isHighlighted = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       horizontalTitleGap: 25,
-      onTap: onTap, // Use the callback passed from parent
+      onTap: () {
+        Navigator.push(
+          context,
+          CupertinoPageRoute(
+            builder: (context) => ChatConversationPage(
+              id: id,
+              name: name,
+              message: message,
+              time: time,
+              unread: unread,
+              isHighlighted: isHighlighted,
+              avatar: avatar,
+            ),
+          ),
+        );
+      },
       leading: CircleAvatar(backgroundImage: AssetImage(avatar), radius: 26),
       title: Text(
         name,
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.bold,
           color: AppPalette.textPrimary,
         ),
       ),
-      subtitle: Text(
-        message,
-        style: const TextStyle(color: AppPalette.black),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
+      subtitle: Text(message, style: const TextStyle(color: AppPalette.black)),
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -49,18 +61,11 @@ class ChatTile extends StatelessWidget {
           ),
           if (unread > 0)
             Padding(
-              padding: const EdgeInsets.only(top: 6),
+              padding: EdgeInsets.only(top: 6, left: 34),
               child: CircleAvatar(
                 radius: 10,
                 backgroundColor: Colors.orange,
-                child: Text(
-                  "$unread",
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: Text("$unread", style: TextStyle(fontSize: 12)),
               ),
             ),
         ],

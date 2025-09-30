@@ -1,13 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:striv/pages/chats/chats_contacts_page.dart';
-import 'package:striv/pages/community/community_screen.dart';
-import 'package:striv/pages/entrepreneur/home_page.dart';
-import 'package:striv/pages/entrepreneur/pitch_upload/pitch_problem_step1.dart';
-import 'package:striv/pages/investor/discover_page.dart';
-import 'package:striv/pages/investor/investor_home_page.dart';
-import 'package:striv/pages/investor/requests_page.dart';
+import 'package:striv/pages/chats_contacts_page.dart';
+import 'package:striv/pages/community_page.dart';
+import 'package:striv/pages/home_page.dart';
+import 'package:striv/pages/discover_page.dart';
+import 'package:striv/pages/requests_page.dart';
 import 'package:striv/utils/app_palette.dart';
 
 class Navigation extends StatefulWidget {
@@ -18,38 +16,21 @@ class Navigation extends StatefulWidget {
 }
 
 class _NavigationState extends State<Navigation> {
-  int _selectedIndex = 0; // Default to "Home"
+  int _selectedIndex = 3; // Default to "Home"
   static bool get isInvestor => getRoleInvestor();
 
   final List<Widget> _pages = [
-    isInvestor
-        ? InvestorHomePage(isInvestor: isInvestor)
-        : HomePage(isInvestor: isInvestor),
-    isInvestor
-        ? DiscoverPage(isInvestor: isInvestor)
-        : DiscoverPage(isInvestor: isInvestor),
-    isInvestor ? RequestsPage(isInvestor: isInvestor) : SizedBox(),
-    isInvestor
-        ? ChatsContactsPage(isInvestor: isInvestor)
-        : ChatsContactsPage(isInvestor: isInvestor),
-    isInvestor
-        ? CommunityHomeScreen(isInvestor: isInvestor)
-        : CommunityHomeScreen(isInvestor: isInvestor),
+    HomePage(),
+    DiscoverPage(isInvestor: isInvestor),
+    RequestsPage(isInvestor: isInvestor),
+    ChatsContactsPage(isInvestor: isInvestor),
+    CommunityPage(isInvestor: isInvestor),
   ];
 
   void _onItemTapped(int index) {
-    if (!isInvestor && index == 2) {
-      // Entrepreneur's Upload tab
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => ProblemSolutionForm()),
-      );
-    } else {
-      // Normal navigation
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
@@ -93,15 +74,10 @@ class _NavigationState extends State<Navigation> {
               icon: Icon(CupertinoIcons.compass),
               label: "Discover",
             ),
-            isInvestor
-                ? BottomNavigationBarItem(
-                    icon: Icon(CupertinoIcons.download_circle),
-                    label: "Requests",
-                  )
-                : BottomNavigationBarItem(
-                    icon: Icon(CupertinoIcons.paperplane),
-                    label: "Upload",
-                  ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.paperplane),
+              label: "Request",
+            ),
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.chat_bubble_2),
               label: "Chats",

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:striv/pages/investor/full_screen_reel_page.dart';
+import 'package:striv/pages/full_screen_reel_page.dart';
 import 'package:video_player/video_player.dart';
 
 class ReelsWidget extends StatefulWidget {

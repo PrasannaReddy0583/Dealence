@@ -6,6 +6,7 @@ class ChatEntites {
   final String lastMessage; // preview of last message
   final String time; // last message time (formatted string for now)
   final int unreadCount; // number of unread messages
+  final bool isHighlighted;
   final DateTime lastSeen; // last seen timestamp
   // pinned / priority chats
 
@@ -16,6 +17,7 @@ class ChatEntites {
     required this.lastMessage,
     required this.time,
     this.unreadCount = 0,
+    this.isHighlighted = false,
     required this.lastSeen,
   });
 }
