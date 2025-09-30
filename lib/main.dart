@@ -29,7 +29,7 @@ class StrivApp extends StatelessWidget {
         fontFamily: "Poppins",
         scaffoldBackgroundColor: AppPalette.primaryBackground,
       ),
-      home: GradientScaffold(child: Navigation()),
+      home: GradientScaffold(child: SplashScreen()),
     );
   }
 }
