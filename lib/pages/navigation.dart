@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:striv/pages/chats_contacts_page.dart';
+import 'package:striv/pages/chats/chats_contacts_page.dart';
 import 'package:striv/pages/community_page.dart';
 import 'package:striv/pages/home_page.dart';
 import 'package:striv/pages/discover_page.dart';
