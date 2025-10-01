@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'pitch_details_screen.dart';
 
 class Pitch_secure extends StatefulWidget {
-  const Pitch_secure({Key? key}) : super(key: key);
+  const Pitch_secure({super.key});
 
   @override
   State<Pitch_secure> createState() => _PitchUploadScreenState();

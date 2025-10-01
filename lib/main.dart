@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:striv/onboarding/splash/splash.dart';
 import 'package:striv/utils/app_palette.dart';
-import 'package:striv/pages/navigation.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

@@ -25,14 +25,24 @@ class AppColors {
   static Color outline = Color(0xFFF5E8DC);
 }
 
-double scale(BuildContext context, double size) {
+// Utility for scaling based on screen width
+double scaleWidth(BuildContext context, double size) {
   double baseWidth = 390;
   double screenWidth = MediaQuery.of(context).size.width;
   return size * (screenWidth / baseWidth);
 }
 
+// Utility for scaling based on screen height
+double scaleHeight(BuildContext context, double size) {
+  double baseHeight = 844; // typical iPhone 14 height
+  double screenHeight = MediaQuery.of(context).size.height;
+  return size * (screenHeight / baseHeight);
+}
+
 class InvestorHomePage extends StatelessWidget {
-  const InvestorHomePage({super.key, required isInvestor});
+  const InvestorHomePage({super.key, required this.isInvestor});
+
+  final bool isInvestor;
 
   @override
   Widget build(BuildContext context) {
@@ -45,45 +55,47 @@ class InvestorHomePage extends StatelessWidget {
         ),
       ),
       child: Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              surfaceTintColor: AppPalette.transparent,
-              floating: true,
-              snap: true,
-              // automaticallyImplyLeading: true,
-              backgroundColor: Color(0xFFFDF5EC),
-              pinned: false,
-              expandedHeight: scale(context, 65),
-              flexibleSpace: Padding(
-                padding: EdgeInsets.only(
-                  left: 16,
-                  right: 16,
-                  top: 10,
-                  bottom: 2,
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                floating: true,
+                snap: true,
+                backgroundColor: Colors.transparent,
+                expandedHeight: scaleHeight(context, 70),
+                flexibleSpace: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: scaleWidth(context, 16),
+                    vertical: scaleHeight(context, 10),
+                  ),
+                  child: HeaderSection(),
                 ),
               ),
-              title: HeaderSection(),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: scale(context, 16),
-                  vertical: scale(context, 18),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: scale(context, 20),
-                  children: [
-                    // HeaderSection(),
-                    // SizedBox(height: scale(context, 18)),
-                    InvestmentsListSection(),
-                    NewInvestorSection(),
-                  ],
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: scaleWidth(context, 16),
+                    vertical: scaleHeight(context, 16),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InvestmentsListSection(),
+                      SizedBox(height: scaleHeight(context, 20)),
+                      NewInvestorSection(),
+                      SizedBox(height: scaleHeight(context, 20)),
+                      TrendingInvestmentsSection(),
+                      SizedBox(height: scaleHeight(context, 20)),
+                      RecentActivitySection(),
+                      SizedBox(height: scaleHeight(context, 20)),
+                      InvestorTipsSection(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -97,27 +109,27 @@ class HeaderSection extends StatelessWidget {
     return Row(
       children: [
         CircleAvatar(
-          radius: scale(context, 26),
+          radius: scaleWidth(context, 26),
           backgroundImage: NetworkImage('https://i.pravatar.cc/300?img=47'),
         ),
-        SizedBox(width: scale(context, 12)),
+        SizedBox(width: scaleWidth(context, 12)),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Hello, Alex!',
+                'Hello, User!',
                 style: TextStyle(
-                  fontSize: scale(context, 18),
+                  fontSize: scaleWidth(context, 18),
                   fontWeight: FontWeight.w600,
                   color: AppColors.titleText,
                 ),
               ),
-              SizedBox(height: scale(context, 4)),
+              SizedBox(height: scaleHeight(context, 4)),
               Text(
                 "${getGreeting()} 👋",
                 style: TextStyle(
-                  fontSize: scale(context, 18),
+                  fontSize: scaleWidth(context, 18),
                   fontWeight: FontWeight.w600,
                   color: AppColors.titleText,
                 ),
@@ -136,7 +148,7 @@ class HeaderSection extends StatelessWidget {
                   ),
                 );
               },
-              icon: Icon(CupertinoIcons.bell, size: 30),
+              icon: Icon(CupertinoIcons.bell, size: scaleWidth(context, 28)),
               color: AppPalette.black,
             ),
             IconButton(
@@ -146,7 +158,7 @@ class HeaderSection extends StatelessWidget {
                   CupertinoPageRoute(builder: (context) => SettingsScreen()),
                 );
               },
-              icon: Icon(CupertinoIcons.settings, size: 30),
+              icon: Icon(CupertinoIcons.settings, size: scaleWidth(context, 28)),
               color: AppPalette.black,
             ),
           ],
@@ -156,6 +168,7 @@ class HeaderSection extends StatelessWidget {
   }
 }
 
+// -------------------- Investments List --------------------
 class InvestmentsListSection extends StatelessWidget {
   const InvestmentsListSection({super.key});
 
@@ -180,7 +193,19 @@ class InvestmentsListSection extends StatelessWidget {
         views: 300,
         feedback: 7,
       ),
+      InvestmentsEntites(
+        investorid: '3',
+        title: "Solaris",
+        subtitle: "Renewable Energy Startups",
+        progress: 0.35,
+        investors: 8,
+        views: 150,
+        feedback: 3,
+      ),
     ];
+
+    double cardHeight = scaleHeight(context, 260);
+    double cardWidth = MediaQuery.of(context).size.width * 0.6;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,46 +217,46 @@ class InvestmentsListSection extends StatelessWidget {
               'My Investments',
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                fontSize: scale(context, 16),
+                fontSize: scaleWidth(context, 16),
                 color: AppColors.titleText,
               ),
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {
-                  // Navigate to full list screen
-                },
-                child: Text(
-                  "View All",
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
+            TextButton(
+              onPressed: () {
+                // Navigate to full list screen
+              },
+              child: Text(
+                "View All",
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
           ],
         ),
-        SizedBox(height: scale(context, 12)),
+        SizedBox(height: scaleHeight(context, 12)),
         SizedBox(
-          height: 280,
+          height: cardHeight,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: BouncingScrollPhysics(),
             itemCount: pitches.length,
             itemBuilder: (context, index) {
-              return InvestmentsCardWidget(investments: pitches[index]);
+              return Container(
+                margin: EdgeInsets.only(right: scaleWidth(context, 16)),
+                width: cardWidth,
+                child: InvestmentsCardWidget(investments: pitches[index]),
+              );
             },
           ),
         ),
-        // SizedBox(height: 10),
       ],
     );
   }
 }
 
-/// Investors Section (fixed overflow issue)
+// -------------------- New Investors --------------------
 class NewInvestorSection extends StatelessWidget {
   const NewInvestorSection({super.key});
 
@@ -253,7 +278,15 @@ class NewInvestorSection extends StatelessWidget {
         'role': 'Growth, Series A',
         'avatar': 'https://i.pravatar.cc/150?img=34',
       },
+      {
+        'name': 'Liam Johnson',
+        'role': 'FinTech, Seed',
+        'avatar': 'https://i.pravatar.cc/150?img=22',
+      },
     ];
+
+    double cardWidth = MediaQuery.of(context).size.width * 0.42;
+    double cardHeight = scaleHeight(context, 180);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,24 +295,24 @@ class NewInvestorSection extends StatelessWidget {
           'Entrepreneur Smart Matching',
           style: TextStyle(
             fontWeight: FontWeight.w700,
-            fontSize: scale(context, 16),
+            fontSize: scaleWidth(context, 16),
             color: AppColors.titleText,
           ),
         ),
-        SizedBox(height: scale(context, 12)),
+        SizedBox(height: scaleHeight(context, 12)),
         SizedBox(
-          height: scale(context, 180),
+          height: cardHeight,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: investors.length,
-            separatorBuilder: (_, __) => SizedBox(width: scale(context, 12)),
+            separatorBuilder: (_, __) => SizedBox(width: scaleWidth(context, 12)),
             itemBuilder: (context, idx) {
               final inv = investors[idx];
               return InvestorCard(
                 name: inv['name']!,
                 role: inv['role']!,
                 avatarUrl: inv['avatar']!,
-                width: MediaQuery.of(context).size.width * 0.42,
+                width: cardWidth,
               );
             },
           ),
@@ -289,6 +322,172 @@ class NewInvestorSection extends StatelessWidget {
   }
 }
 
+// -------------------- Trending Investments --------------------
+class TrendingInvestmentsSection extends StatelessWidget {
+  const TrendingInvestmentsSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final trending = [
+      "AI Startups",
+      "HealthTech",
+      "Green Energy",
+      "FinTech Innovations",
+      "Blockchain Startups"
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Trending Investments',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: scaleWidth(context, 16),
+            color: AppColors.titleText,
+          ),
+        ),
+        SizedBox(height: scaleHeight(context, 12)),
+        Wrap(
+          spacing: scaleWidth(context, 12),
+          runSpacing: scaleHeight(context, 12),
+          children: trending
+              .map(
+                (t) => Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: scaleWidth(context, 16),
+                    vertical: scaleHeight(context, 10),
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.softElev,
+                    borderRadius: BorderRadius.circular(scaleWidth(context, 14)),
+                  ),
+                  child: Text(
+                    t,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.accentText,
+                      fontSize: scaleWidth(context, 13),
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      ],
+    );
+  }
+}
+
+// -------------------- Recent Activity --------------------
+class RecentActivitySection extends StatelessWidget {
+  const RecentActivitySection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final activities = [
+      {"action": "Invested in GreenTech", "time": "2h ago"},
+      {"action": "Connected with Sophia Bennett", "time": "5h ago"},
+      {"action": "Viewed EcoBloom pitch", "time": "1d ago"},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Recent Activity',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: scaleWidth(context, 16),
+            color: AppColors.titleText,
+          ),
+        ),
+        SizedBox(height: scaleHeight(context, 12)),
+        Column(
+          children: activities
+              .map(
+                (act) => ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    backgroundColor: AppColors.softElev,
+                    child: Icon(CupertinoIcons.check_mark, size: scaleWidth(context, 20)),
+                  ),
+                  title: Text(
+                    act['action']!,
+                    style: TextStyle(
+                      fontSize: scaleWidth(context, 14),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  subtitle: Text(
+                    act['time']!,
+                    style: TextStyle(
+                      fontSize: scaleWidth(context, 12),
+                      color: AppColors.mutedText,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      ],
+    );
+  }
+}
+
+// -------------------- Investor Tips --------------------
+class InvestorTipsSection extends StatelessWidget {
+  const InvestorTipsSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final tips = [
+      "Diversify your investments across sectors.",
+      "Keep an eye on emerging tech trends.",
+      "Engage with early-stage entrepreneurs.",
+      "Review financial reports carefully.",
+      "Join investor networking events.",
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Investor Tips',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: scaleWidth(context, 16),
+            color: AppColors.titleText,
+          ),
+        ),
+        SizedBox(height: scaleHeight(context, 12)),
+        Column(
+          children: tips
+              .map(
+                (tip) => Container(
+                  margin: EdgeInsets.only(bottom: scaleHeight(context, 10)),
+                  padding: EdgeInsets.all(scaleWidth(context, 12)),
+                  decoration: BoxDecoration(
+                    color: AppColors.softElev,
+                    borderRadius: BorderRadius.circular(scaleWidth(context, 12)),
+                  ),
+                  child: Text(
+                    "• $tip",
+                    style: TextStyle(
+                      fontSize: scaleWidth(context, 13),
+                      color: AppColors.accentText,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      ],
+    );
+  }
+}
+
+// -------------------- Investor Card --------------------
 class InvestorCard extends StatelessWidget {
   final String name;
   final String role;
@@ -308,66 +507,66 @@ class InvestorCard extends StatelessWidget {
     return Container(
       width: width,
       padding: EdgeInsets.symmetric(
-        horizontal: scale(context, 12),
-        vertical: scale(context, 14),
+        horizontal: scaleWidth(context, 12),
+        vertical: scaleHeight(context, 14),
       ),
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(scale(context, 14)),
+        borderRadius: BorderRadius.circular(scaleWidth(context, 14)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.03),
-            blurRadius: scale(context, 8),
-            offset: Offset(0, scale(context, 4)),
+            blurRadius: scaleWidth(context, 8),
+            offset: Offset(0, scaleHeight(context, 4)),
           ),
         ],
       ),
       child: Column(
         children: [
           CircleAvatar(
-            radius: scale(context, 28),
+            radius: scaleWidth(context, 28),
             backgroundImage: NetworkImage(avatarUrl),
             backgroundColor: AppColors.softElev,
           ),
-          SizedBox(height: scale(context, 8)),
+          SizedBox(height: scaleHeight(context, 8)),
           Text(
             name,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.w700,
-              fontSize: scale(context, 13),
+              fontSize: scaleWidth(context, 13),
               color: AppColors.titleText,
             ),
           ),
-          SizedBox(height: scale(context, 2)),
+          SizedBox(height: scaleHeight(context, 2)),
           Text(
             role,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: scale(context, 11),
+              fontSize: scaleWidth(context, 11),
               color: AppColors.mutedText,
             ),
           ),
           Spacer(),
           SizedBox(
             width: double.infinity,
-            height: scale(context, 32),
+            height: scaleHeight(context, 32),
             child: OutlinedButton(
               onPressed: () {},
               style: OutlinedButton.styleFrom(
                 backgroundColor: AppColors.background,
                 side: BorderSide(color: AppColors.outline),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(scale(context, 10)),
+                  borderRadius: BorderRadius.circular(scaleWidth(context, 10)),
                 ),
-                padding: EdgeInsets.symmetric(vertical: scale(context, 6)),
+                padding: EdgeInsets.symmetric(vertical: scaleHeight(context, 6)),
               ),
               child: Text(
                 'Connect',
                 style: TextStyle(
                   color: AppColors.primary,
                   fontWeight: FontWeight.w700,
-                  fontSize: scale(context, 12),
+                  fontSize: scaleWidth(context, 12),
                 ),
               ),
             ),
@@ -378,44 +577,12 @@ class InvestorCard extends StatelessWidget {
   }
 }
 
-class StatColumn extends StatelessWidget {
-  final String number;
-  final String label;
-  const StatColumn({super.key, required this.number, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          number,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-            color: AppColors.titleText,
-          ),
-        ),
-        SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 11, color: AppColors.mutedText)),
-      ],
-    );
-  }
-}
-
+// -------------------- Greeting --------------------
 String getGreeting() {
   final now = DateTime.now();
   final hour = now.hour;
-  final minute = now.minute;
-
-  if (hour < 12 || (hour == 11 && minute <= 59)) {
-    return "Good Morning";
-  } else if ((hour == 12 || hour < 15) || (hour == 15 && minute <= 30)) {
-    return "Good Afternoon";
-  } else if ((hour > 15 && hour < 20) ||
-      (hour == 15 && minute > 30) ||
-      (hour == 20 && minute <= 30)) {
-    return "Good Evening";
-  } else {
-    return "Good Night";
-  }
+  if (hour < 12) return "Good Morning";
+  if (hour < 15) return "Good Afternoon";
+  if (hour < 20) return "Good Evening";
+  return "Good Night";
 }

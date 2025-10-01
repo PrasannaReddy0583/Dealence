@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:striv/entites/investments_entites.dart';
-import 'package:striv/pages/investor/investor_home_page.dart';
 import 'package:striv/utils/app_palette.dart';
+import 'package:striv/pages/investor/investor_home_page.dart'; // for scaleWidth/scaleHeight and StatColumn
 
 class InvestmentsCardWidget extends StatelessWidget {
   final InvestmentsEntites investments;
@@ -9,38 +9,41 @@ class InvestmentsCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double cardWidth = MediaQuery.of(context).size.width * 0.8;
+
     return Container(
-      width: MediaQuery.of(context).size.width * 0.8,
-      margin: EdgeInsets.only(right: scale(context, 16)),
-      padding: EdgeInsets.all(scale(context, 16)),
+      width: cardWidth,
+      margin: EdgeInsets.only(right: scaleWidth(context, 16)),
+      padding: EdgeInsets.all(scaleWidth(context, 16)),
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(scale(context, 16)),
+        borderRadius: BorderRadius.circular(scaleWidth(context, 16)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
-            blurRadius: scale(context, 12),
-            offset: Offset(0, scale(context, 6)),
+            blurRadius: scaleWidth(context, 12),
+            offset: Offset(0, scaleHeight(context, 6)),
           ),
         ],
       ),
       child: Column(
         children: [
+          // Pitch Header
           Row(
             children: [
               Container(
-                width: scale(context, 56),
-                height: scale(context, 56),
+                width: scaleWidth(context, 56),
+                height: scaleWidth(context, 56),
                 decoration: BoxDecoration(
                   color: AppColors.softElev,
-                  borderRadius: BorderRadius.circular(scale(context, 10)),
+                  borderRadius: BorderRadius.circular(scaleWidth(context, 10)),
                   image: DecorationImage(
                     fit: BoxFit.cover,
                     image: NetworkImage('https://via.placeholder.com/64'),
                   ),
                 ),
               ),
-              SizedBox(width: scale(context, 12)),
+              SizedBox(width: scaleWidth(context, 12)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,16 +51,16 @@ class InvestmentsCardWidget extends StatelessWidget {
                     Text(
                       investments.title,
                       style: TextStyle(
-                        fontSize: scale(context, 16),
+                        fontSize: scaleWidth(context, 16),
                         fontWeight: FontWeight.w700,
                         color: AppColors.titleText,
                       ),
                     ),
-                    SizedBox(height: scale(context, 4)),
+                    SizedBox(height: scaleHeight(context, 4)),
                     Text(
                       investments.subtitle,
                       style: TextStyle(
-                        fontSize: scale(context, 12),
+                        fontSize: scaleWidth(context, 12),
                         color: AppColors.mutedText,
                       ),
                     ),
@@ -67,15 +70,16 @@ class InvestmentsCardWidget extends StatelessWidget {
             ],
           ),
 
-          SizedBox(height: scale(context, 14)),
+          SizedBox(height: scaleHeight(context, 14)),
 
+          // Funding progress label
           Row(
             children: [
               Expanded(
                 child: Text(
                   'Funding Progress',
                   style: TextStyle(
-                    fontSize: scale(context, 13),
+                    fontSize: scaleWidth(context, 13),
                     fontWeight: FontWeight.w600,
                     color: AppColors.titleText,
                   ),
@@ -84,33 +88,34 @@ class InvestmentsCardWidget extends StatelessWidget {
               Text(
                 'Goal Reached',
                 style: TextStyle(
-                  fontSize: scale(context, 12),
+                  fontSize: scaleWidth(context, 12),
                   color: AppColors.mutedText,
                 ),
               ),
             ],
           ),
 
-          SizedBox(height: scale(context, 8)),
+          SizedBox(height: scaleHeight(context, 8)),
 
+          // Progress Bar
           Row(
             children: [
               Expanded(
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(scale(context, 10)),
+                  borderRadius: BorderRadius.circular(scaleWidth(context, 10)),
                   child: LinearProgressIndicator(
                     value: investments.progress,
-                    minHeight: scale(context, 10),
+                    minHeight: scaleHeight(context, 10),
                     backgroundColor: AppColors.progressBg,
                     valueColor: AlwaysStoppedAnimation(AppColors.progressFill),
                   ),
                 ),
               ),
-              SizedBox(width: scale(context, 12)),
+              SizedBox(width: scaleWidth(context, 12)),
               Text(
                 '${(investments.progress * 100).toInt()}%',
                 style: TextStyle(
-                  fontSize: scale(context, 13),
+                  fontSize: scaleWidth(context, 13),
                   fontWeight: FontWeight.w700,
                   color: AppColors.titleText,
                 ),
@@ -118,8 +123,9 @@ class InvestmentsCardWidget extends StatelessWidget {
             ],
           ),
 
-          SizedBox(height: scale(context, 14)),
+          SizedBox(height: scaleHeight(context, 14)),
 
+          // Stats
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -138,24 +144,25 @@ class InvestmentsCardWidget extends StatelessWidget {
             ],
           ),
 
-          SizedBox(height: scale(context, 16)),
+          SizedBox(height: scaleHeight(context, 16)),
 
+          // View Analytics Button
           SizedBox(
             width: double.infinity,
-            height: scale(context, 44),
+            height: scaleHeight(context, 44),
             child: ElevatedButton(
               onPressed: () {},
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.buttonBg,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(scale(context, 12)),
+                  borderRadius: BorderRadius.circular(scaleWidth(context, 12)),
                 ),
                 elevation: 0,
               ),
               child: Text(
                 'View Pitch Analytics',
                 style: TextStyle(
-                  fontSize: scale(context, 15),
+                  fontSize: scaleWidth(context, 15),
                   fontWeight: FontWeight.w600,
                   color: AppPalette.black,
                 ),
@@ -167,3 +174,35 @@ class InvestmentsCardWidget extends StatelessWidget {
     );
   }
 }
+
+class StatColumn extends StatelessWidget {
+  final String number;
+  final String label;
+
+  const StatColumn({super.key, required this.number, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          number,
+          style: TextStyle(
+            fontSize: scaleWidth(context, 16),
+            fontWeight: FontWeight.w800,
+            color: AppColors.titleText,
+          ),
+        ),
+        SizedBox(height: scaleHeight(context, 4)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: scaleWidth(context, 11),
+            color: AppColors.mutedText,
+          ),
+        ),
+      ],
+    );
+  }
+}
+

@@ -3,7 +3,6 @@ import 'package:striv/auth/pages/signupscreen.dart';
 import 'package:striv/auth/services/auth_service.dart';
 import 'package:striv/auth/widgets/auth_slider.dart';
 import 'package:striv/constants.dart';
-import 'package:striv/pages/entrepreneur/home_page.dart';
 import 'package:striv/pages/navigation.dart';
 
 class LoginScreen extends StatefulWidget {
