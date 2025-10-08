@@ -118,5 +118,5 @@ class _NavigationState extends State<Navigation> {
 }
 
 bool getRoleInvestor() {
-  return true;
+  return false;
 }

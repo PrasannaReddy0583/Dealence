@@ -25,24 +25,155 @@ class AppColors {
   static Color outline = Color(0xFFF5E8DC);
 }
 
-// Utility for scaling based on screen width
-double scaleWidth(BuildContext context, double size) {
+double scale(BuildContext context, double size) {
   double baseWidth = 390;
   double screenWidth = MediaQuery.of(context).size.width;
   return size * (screenWidth / baseWidth);
 }
 
-// Utility for scaling based on screen height
-double scaleHeight(BuildContext context, double size) {
-  double baseHeight = 844; // typical iPhone 14 height
-  double screenHeight = MediaQuery.of(context).size.height;
-  return size * (screenHeight / baseHeight);
+// Model for Entrepreneur/Investor matches
+class EntrepreneurMatch {
+  final String id;
+  final String name;
+  final String role;
+  final String avatarUrl;
+
+  EntrepreneurMatch({
+    required this.id,
+    required this.name,
+    required this.role,
+    required this.avatarUrl,
+  });
+
+  factory EntrepreneurMatch.fromJson(Map<String, dynamic> json) {
+    return EntrepreneurMatch(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      role: json['role'] ?? '',
+      avatarUrl: json['avatarUrl'] ?? '',
+    );
+  }
 }
 
-class InvestorHomePage extends StatelessWidget {
+// Model for User Profile
+class UserProfile {
+  final String name;
+  final String avatarUrl;
+
+  UserProfile({required this.name, required this.avatarUrl});
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      name: json['name'] ?? 'User',
+      avatarUrl: json['avatarUrl'] ?? 'https://i.pravatar.cc/300?img=47',
+    );
+  }
+}
+
+class InvestorHomePage extends StatefulWidget {
+  final bool isInvestor;
+
   const InvestorHomePage({super.key, required this.isInvestor});
 
-  final bool isInvestor;
+  @override
+  State<InvestorHomePage> createState() => _InvestorHomePageState();
+}
+
+class _InvestorHomePageState extends State<InvestorHomePage> {
+  // State variables
+  late Future<UserProfile> _userProfileFuture;
+  late Future<List<InvestmentsEntites>> _investmentsFuture;
+  late Future<List<EntrepreneurMatch>> _entrepreneurMatchesFuture;
+
+  String _searchQuery = '';
+  bool _isSearching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() {
+    _userProfileFuture = _fetchUserProfile();
+    _investmentsFuture = _fetchInvestments();
+    _entrepreneurMatchesFuture = _fetchEntrepreneurMatches();
+  }
+
+  // TODO: Replace with actual API calls
+  Future<UserProfile> _fetchUserProfile() async {
+    // Simulate API call
+    await Future.delayed(Duration(milliseconds: 500));
+    return UserProfile(
+      name: 'Alex',
+      avatarUrl: 'https://i.pravatar.cc/300?img=47',
+    );
+  }
+
+  Future<List<InvestmentsEntites>> _fetchInvestments() async {
+    // Simulate API call
+    await Future.delayed(Duration(milliseconds: 800));
+    return [
+      InvestmentsEntites(
+        investorid: "1",
+        title: "EcoBloom",
+        subtitle: "Sustainable Consumer Goods",
+        progress: 0.5,
+        investors: 12,
+        views: 250,
+        feedback: 5,
+      ),
+      InvestmentsEntites(
+        investorid: '2',
+        title: "GreenTech",
+        subtitle: "Clean Energy Solutions",
+        progress: 0.7,
+        investors: 18,
+        views: 300,
+        feedback: 7,
+      ),
+    ];
+  }
+
+  Future<List<EntrepreneurMatch>> _fetchEntrepreneurMatches() async {
+    // Simulate API call
+    await Future.delayed(Duration(milliseconds: 600));
+    return [
+      EntrepreneurMatch(
+        id: '1',
+        name: 'Ethan Carter',
+        role: 'Tech, Early Stage',
+        avatarUrl: 'https://i.pravatar.cc/150?img=12',
+      ),
+      EntrepreneurMatch(
+        id: '2',
+        name: 'Sophia Bennett',
+        role: 'Sustainability, Seed',
+        avatarUrl: 'https://i.pravatar.cc/150?img=8',
+      ),
+      EntrepreneurMatch(
+        id: '3',
+        name: 'Maya Patel',
+        role: 'Growth, Series A',
+        avatarUrl: 'https://i.pravatar.cc/150?img=34',
+      ),
+    ];
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+      _isSearching = query.isNotEmpty;
+    });
+    // TODO: Implement search functionality
+    // You might want to debounce this to avoid too many API calls
+  }
+
+  void _refreshData() {
+    setState(() {
+      _loadData();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,40 +187,139 @@ class InvestorHomePage extends StatelessWidget {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: SafeArea(
+        body: RefreshIndicator(
+          onRefresh: () async {
+            _refreshData();
+            // Wait for all futures to complete
+            await Future.wait([
+              _userProfileFuture,
+              _investmentsFuture,
+              _entrepreneurMatchesFuture,
+            ]);
+          },
           child: CustomScrollView(
             slivers: [
               SliverAppBar(
+                surfaceTintColor: AppPalette.transparent,
                 floating: true,
                 snap: true,
-                backgroundColor: Colors.transparent,
-                expandedHeight: scaleHeight(context, 70),
+                backgroundColor: Color(0xFFFDF5EC),
+                pinned: false,
+                expandedHeight: scale(context, 65),
                 flexibleSpace: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: scaleWidth(context, 16),
-                    vertical: scaleHeight(context, 10),
+                  padding: EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    top: 10,
+                    bottom: 2,
                   ),
-                  child: HeaderSection(),
+                ),
+                title: FutureBuilder<UserProfile>(
+                  future: _userProfileFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return HeaderSectionSkeleton();
+                    }
+                    if (snapshot.hasError || !snapshot.hasData) {
+                      return HeaderSection(
+                        userName: 'User',
+                        avatarUrl: 'https://i.pravatar.cc/300?img=47',
+                      );
+                    }
+                    return HeaderSection(
+                      userName: snapshot.data!.name,
+                      avatarUrl: snapshot.data!.avatarUrl,
+                    );
+                  },
                 ),
               ),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: scaleWidth(context, 16),
-                    vertical: scaleHeight(context, 16),
+                    horizontal: scale(context, 16),
+                    vertical: scale(context, 8),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: scale(context, 16),
                     children: [
-                      InvestmentsListSection(),
-                      SizedBox(height: scaleHeight(context, 20)),
-                      NewInvestorSection(),
-                      SizedBox(height: scaleHeight(context, 20)),
-                      TrendingInvestmentsSection(),
-                      SizedBox(height: scaleHeight(context, 20)),
-                      RecentActivitySection(),
-                      SizedBox(height: scaleHeight(context, 20)),
-                      InvestorTipsSection(),
+                      TextField(
+                        cursorColor: AppPalette.black,
+                        onChanged: _onSearchChanged,
+                        decoration: InputDecoration(
+                          hintText: "Search for Entrepreneurs",
+                          hintStyle: TextStyle(color: AppPalette.black),
+                          prefixIcon: Icon(
+                            CupertinoIcons.search,
+                            color: AppPalette.black,
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.all(12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      FutureBuilder<List<InvestmentsEntites>>(
+                        future: _investmentsFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return InvestmentsListSectionSkeleton();
+                          }
+                          if (snapshot.hasError) {
+                            return ErrorWidget.withDetails(
+                              message: 'Failed to load investments',
+                            );
+                          }
+                          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return EmptyInvestmentsSection();
+                          }
+                          return InvestmentsListSection(
+                            investments: snapshot.data!,
+                            onViewAll: () {
+                              // TODO: Navigate to full investments list
+                            },
+                          );
+                        },
+                      ),
+                      FutureBuilder<List<EntrepreneurMatch>>(
+                        future: _entrepreneurMatchesFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return NewInvestorSectionSkeleton();
+                          }
+                          if (snapshot.hasError) {
+                            return ErrorWidget.withDetails(
+                              message: 'Failed to load matches',
+                            );
+                          }
+                          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return EmptyMatchesSection();
+                          }
+                          return NewInvestorSection(
+                            entrepreneurs: snapshot.data!,
+                            onConnect: (entrepreneurId) {
+                              // TODO: Implement connect functionality
+                              print('Connect with: $entrepreneurId');
+                            },
+                            onDismiss: (entrepreneurId) {
+                              // TODO: Implement dismiss functionality
+                              setState(() {
+                                _entrepreneurMatchesFuture =
+                                    _entrepreneurMatchesFuture.then(
+                                      (matches) => matches
+                                          .where((m) => m.id != entrepreneurId)
+                                          .toList(),
+                                    );
+                              });
+                            },
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -103,33 +333,42 @@ class InvestorHomePage extends StatelessWidget {
 }
 
 class HeaderSection extends StatelessWidget {
-  const HeaderSection({super.key});
+  final String userName;
+  final String avatarUrl;
+
+  const HeaderSection({
+    super.key,
+    required this.userName,
+    required this.avatarUrl,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         CircleAvatar(
-          radius: scaleWidth(context, 26),
-          backgroundImage: NetworkImage('https://i.pravatar.cc/300?img=47'),
+          radius: scale(context, 26),
+          backgroundImage: NetworkImage(avatarUrl),
+          backgroundColor: AppColors.softElev,
         ),
-        SizedBox(width: scaleWidth(context, 12)),
+        SizedBox(width: scale(context, 12)),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Hello, User!',
+                'Hello, $userName!',
                 style: TextStyle(
-                  fontSize: scaleWidth(context, 18),
+                  fontSize: scale(context, 18),
                   fontWeight: FontWeight.w600,
                   color: AppColors.titleText,
                 ),
               ),
-              SizedBox(height: scaleHeight(context, 4)),
+              SizedBox(height: scale(context, 4)),
               Text(
                 "${getGreeting()} 👋",
                 style: TextStyle(
-                  fontSize: scaleWidth(context, 18),
+                  fontSize: scale(context, 18),
                   fontWeight: FontWeight.w600,
                   color: AppColors.titleText,
                 ),
@@ -148,7 +387,7 @@ class HeaderSection extends StatelessWidget {
                   ),
                 );
               },
-              icon: Icon(CupertinoIcons.bell, size: scaleWidth(context, 28)),
+              icon: Icon(CupertinoIcons.bell, size: 30),
               color: AppPalette.black,
             ),
             IconButton(
@@ -158,7 +397,7 @@ class HeaderSection extends StatelessWidget {
                   CupertinoPageRoute(builder: (context) => SettingsScreen()),
                 );
               },
-              icon: Icon(CupertinoIcons.settings, size: scaleWidth(context, 28)),
+              icon: Icon(CupertinoIcons.settings, size: 30),
               color: AppPalette.black,
             ),
           ],
@@ -168,45 +407,59 @@ class HeaderSection extends StatelessWidget {
   }
 }
 
-// -------------------- Investments List --------------------
-class InvestmentsListSection extends StatelessWidget {
-  const InvestmentsListSection({super.key});
+class HeaderSectionSkeleton extends StatelessWidget {
+  const HeaderSectionSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final List<InvestmentsEntites> pitches = [
-      InvestmentsEntites(
-        investorid: "1",
-        title: "EcoBloom",
-        subtitle: "Sustainable Consumer Goods",
-        progress: 0.5,
-        investors: 12,
-        views: 250,
-        feedback: 5,
-      ),
-      InvestmentsEntites(
-        investorid: '1',
-        title: "GreenTech",
-        subtitle: "Clean Energy Solutions",
-        progress: 0.7,
-        investors: 18,
-        views: 300,
-        feedback: 7,
-      ),
-      InvestmentsEntites(
-        investorid: '3',
-        title: "Solaris",
-        subtitle: "Renewable Energy Startups",
-        progress: 0.35,
-        investors: 8,
-        views: 150,
-        feedback: 3,
-      ),
-    ];
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: scale(context, 26),
+          backgroundColor: AppColors.softElev,
+        ),
+        SizedBox(width: scale(context, 12)),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 100,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: AppColors.softElev,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              SizedBox(height: scale(context, 4)),
+              Container(
+                width: 120,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: AppColors.softElev,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
 
-    double cardHeight = scaleHeight(context, 260);
-    double cardWidth = MediaQuery.of(context).size.width * 0.6;
+class InvestmentsListSection extends StatelessWidget {
+  final List<InvestmentsEntites> investments;
+  final VoidCallback? onViewAll;
 
+  const InvestmentsListSection({
+    super.key,
+    required this.investments,
+    this.onViewAll,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -217,36 +470,71 @@ class InvestmentsListSection extends StatelessWidget {
               'My Investments',
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                fontSize: scaleWidth(context, 16),
+                fontSize: scale(context, 16),
                 color: AppColors.titleText,
               ),
             ),
-            TextButton(
-              onPressed: () {
-                // Navigate to full list screen
-              },
-              child: Text(
-                "View All",
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w700,
+            if (investments.length > 2)
+              TextButton(
+                onPressed: onViewAll,
+                child: Text(
+                  "View All",
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
-        SizedBox(height: scaleHeight(context, 12)),
+        SizedBox(height: scale(context, 6)),
         SizedBox(
-          height: cardHeight,
+          height: 310,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: BouncingScrollPhysics(),
-            itemCount: pitches.length,
+            itemCount: investments.length,
+            itemBuilder: (context, index) {
+              return InvestmentsCardWidget(investments: investments[index]);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class InvestmentsListSectionSkeleton extends StatelessWidget {
+  const InvestmentsListSectionSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 150,
+          height: 20,
+          decoration: BoxDecoration(
+            color: AppColors.softElev,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        SizedBox(height: scale(context, 12)),
+        SizedBox(
+          height: 280,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: 2,
             itemBuilder: (context, index) {
               return Container(
-                margin: EdgeInsets.only(right: scaleWidth(context, 16)),
-                width: cardWidth,
-                child: InvestmentsCardWidget(investments: pitches[index]),
+                width: 200,
+                margin: EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.softElev,
+                  borderRadius: BorderRadius.circular(12),
+                ),
               );
             },
           ),
@@ -256,38 +544,57 @@ class InvestmentsListSection extends StatelessWidget {
   }
 }
 
-// -------------------- New Investors --------------------
-class NewInvestorSection extends StatelessWidget {
-  const NewInvestorSection({super.key});
+class EmptyInvestmentsSection extends StatelessWidget {
+  const EmptyInvestmentsSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final investors = [
-      {
-        'name': 'Ethan Carter',
-        'role': 'Tech, Early Stage',
-        'avatar': 'https://i.pravatar.cc/150?img=12',
-      },
-      {
-        'name': 'Sophia Bennett',
-        'role': 'Sustainability, Seed',
-        'avatar': 'https://i.pravatar.cc/150?img=8',
-      },
-      {
-        'name': 'Maya Patel',
-        'role': 'Growth, Series A',
-        'avatar': 'https://i.pravatar.cc/150?img=34',
-      },
-      {
-        'name': 'Liam Johnson',
-        'role': 'FinTech, Seed',
-        'avatar': 'https://i.pravatar.cc/150?img=22',
-      },
-    ];
+    return Container(
+      padding: EdgeInsets.all(scale(context, 24)),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(scale(context, 12)),
+      ),
+      child: Column(
+        children: [
+          Icon(CupertinoIcons.briefcase, size: 48, color: AppColors.mutedText),
+          SizedBox(height: scale(context, 12)),
+          Text(
+            'No investments yet',
+            style: TextStyle(
+              fontSize: scale(context, 16),
+              fontWeight: FontWeight.w600,
+              color: AppColors.titleText,
+            ),
+          ),
+          SizedBox(height: scale(context, 4)),
+          Text(
+            'Start exploring entrepreneurs',
+            style: TextStyle(
+              fontSize: scale(context, 14),
+              color: AppColors.mutedText,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-    double cardWidth = MediaQuery.of(context).size.width * 0.42;
-    double cardHeight = scaleHeight(context, 180);
+class NewInvestorSection extends StatelessWidget {
+  final List<EntrepreneurMatch> entrepreneurs;
+  final Function(String)? onConnect;
+  final Function(String)? onDismiss;
 
+  const NewInvestorSection({
+    super.key,
+    required this.entrepreneurs,
+    this.onConnect,
+    this.onDismiss,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -295,24 +602,26 @@ class NewInvestorSection extends StatelessWidget {
           'Entrepreneur Smart Matching',
           style: TextStyle(
             fontWeight: FontWeight.w700,
-            fontSize: scaleWidth(context, 16),
+            fontSize: scale(context, 16),
             color: AppColors.titleText,
           ),
         ),
-        SizedBox(height: scaleHeight(context, 12)),
+        SizedBox(height: scale(context, 12)),
         SizedBox(
-          height: cardHeight,
+          height: scale(context, 180),
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            itemCount: investors.length,
-            separatorBuilder: (_, __) => SizedBox(width: scaleWidth(context, 12)),
+            itemCount: entrepreneurs.length,
+            separatorBuilder: (_, __) => SizedBox(width: scale(context, 12)),
             itemBuilder: (context, idx) {
-              final inv = investors[idx];
-              return InvestorCard(
-                name: inv['name']!,
-                role: inv['role']!,
-                avatarUrl: inv['avatar']!,
-                width: cardWidth,
+              final entrepreneur = entrepreneurs[idx];
+              return EntrepreneurHomeMatchsSuggestionTile(
+                name: entrepreneur.name,
+                role: entrepreneur.role,
+                avatarUrl: entrepreneur.avatarUrl,
+                width: MediaQuery.of(context).size.width * 0.42,
+                onConnect: () => onConnect?.call(entrepreneur.id),
+                onDismiss: () => onDismiss?.call(entrepreneur.id),
               );
             },
           ),
@@ -322,184 +631,99 @@ class NewInvestorSection extends StatelessWidget {
   }
 }
 
-// -------------------- Trending Investments --------------------
-class TrendingInvestmentsSection extends StatelessWidget {
-  const TrendingInvestmentsSection({super.key});
+class NewInvestorSectionSkeleton extends StatelessWidget {
+  const NewInvestorSectionSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final trending = [
-      "AI Startups",
-      "HealthTech",
-      "Green Energy",
-      "FinTech Innovations",
-      "Blockchain Startups"
-    ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Trending Investments',
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: scaleWidth(context, 16),
-            color: AppColors.titleText,
+        Container(
+          width: 200,
+          height: 20,
+          decoration: BoxDecoration(
+            color: AppColors.softElev,
+            borderRadius: BorderRadius.circular(4),
           ),
         ),
-        SizedBox(height: scaleHeight(context, 12)),
-        Wrap(
-          spacing: scaleWidth(context, 12),
-          runSpacing: scaleHeight(context, 12),
-          children: trending
-              .map(
-                (t) => Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: scaleWidth(context, 16),
-                    vertical: scaleHeight(context, 10),
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.softElev,
-                    borderRadius: BorderRadius.circular(scaleWidth(context, 14)),
-                  ),
-                  child: Text(
-                    t,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.accentText,
-                      fontSize: scaleWidth(context, 13),
-                    ),
-                  ),
+        SizedBox(height: scale(context, 12)),
+        SizedBox(
+          height: scale(context, 180),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: 3,
+            itemBuilder: (context, index) {
+              return Container(
+                width: MediaQuery.of(context).size.width * 0.42,
+                margin: EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.softElev,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              )
-              .toList(),
+              );
+            },
+          ),
         ),
       ],
     );
   }
 }
 
-// -------------------- Recent Activity --------------------
-class RecentActivitySection extends StatelessWidget {
-  const RecentActivitySection({super.key});
+class EmptyMatchesSection extends StatelessWidget {
+  const EmptyMatchesSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final activities = [
-      {"action": "Invested in GreenTech", "time": "2h ago"},
-      {"action": "Connected with Sophia Bennett", "time": "5h ago"},
-      {"action": "Viewed EcoBloom pitch", "time": "1d ago"},
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Recent Activity',
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: scaleWidth(context, 16),
-            color: AppColors.titleText,
+    return Container(
+      padding: EdgeInsets.all(scale(context, 24)),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(scale(context, 12)),
+      ),
+      child: Column(
+        children: [
+          Icon(CupertinoIcons.person_2, size: 48, color: AppColors.mutedText),
+          SizedBox(height: scale(context, 12)),
+          Text(
+            'No matches available',
+            style: TextStyle(
+              fontSize: scale(context, 16),
+              fontWeight: FontWeight.w600,
+              color: AppColors.titleText,
+            ),
           ),
-        ),
-        SizedBox(height: scaleHeight(context, 12)),
-        Column(
-          children: activities
-              .map(
-                (act) => ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: CircleAvatar(
-                    backgroundColor: AppColors.softElev,
-                    child: Icon(CupertinoIcons.check_mark, size: scaleWidth(context, 20)),
-                  ),
-                  title: Text(
-                    act['action']!,
-                    style: TextStyle(
-                      fontSize: scaleWidth(context, 14),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  subtitle: Text(
-                    act['time']!,
-                    style: TextStyle(
-                      fontSize: scaleWidth(context, 12),
-                      color: AppColors.mutedText,
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
-        ),
-      ],
+          SizedBox(height: scale(context, 4)),
+          Text(
+            'Check back later for new matches',
+            style: TextStyle(
+              fontSize: scale(context, 14),
+              color: AppColors.mutedText,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-// -------------------- Investor Tips --------------------
-class InvestorTipsSection extends StatelessWidget {
-  const InvestorTipsSection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final tips = [
-      "Diversify your investments across sectors.",
-      "Keep an eye on emerging tech trends.",
-      "Engage with early-stage entrepreneurs.",
-      "Review financial reports carefully.",
-      "Join investor networking events.",
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Investor Tips',
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: scaleWidth(context, 16),
-            color: AppColors.titleText,
-          ),
-        ),
-        SizedBox(height: scaleHeight(context, 12)),
-        Column(
-          children: tips
-              .map(
-                (tip) => Container(
-                  margin: EdgeInsets.only(bottom: scaleHeight(context, 10)),
-                  padding: EdgeInsets.all(scaleWidth(context, 12)),
-                  decoration: BoxDecoration(
-                    color: AppColors.softElev,
-                    borderRadius: BorderRadius.circular(scaleWidth(context, 12)),
-                  ),
-                  child: Text(
-                    "• $tip",
-                    style: TextStyle(
-                      fontSize: scaleWidth(context, 13),
-                      color: AppColors.accentText,
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
-        ),
-      ],
-    );
-  }
-}
-
-// -------------------- Investor Card --------------------
-class InvestorCard extends StatelessWidget {
+class EntrepreneurHomeMatchsSuggestionTile extends StatelessWidget {
   final String name;
   final String role;
   final String avatarUrl;
   final double width;
+  final VoidCallback? onConnect;
+  final VoidCallback? onDismiss;
 
-  const InvestorCard({
+  const EntrepreneurHomeMatchsSuggestionTile({
     super.key,
     required this.name,
     required this.role,
     required this.avatarUrl,
     required this.width,
+    this.onConnect,
+    this.onDismiss,
   });
 
   @override
@@ -507,66 +731,75 @@ class InvestorCard extends StatelessWidget {
     return Container(
       width: width,
       padding: EdgeInsets.symmetric(
-        horizontal: scaleWidth(context, 12),
-        vertical: scaleHeight(context, 14),
+        horizontal: scale(context, 12),
+        vertical: scale(context, 14),
       ),
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(scaleWidth(context, 14)),
+        borderRadius: BorderRadius.circular(scale(context, 14)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.03),
-            blurRadius: scaleWidth(context, 8),
-            offset: Offset(0, scaleHeight(context, 4)),
+            blurRadius: scale(context, 8),
+            offset: Offset(0, scale(context, 4)),
           ),
         ],
       ),
       child: Column(
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: onDismiss,
+                child: Icon(CupertinoIcons.clear, size: 11),
+              ),
+            ],
+          ),
           CircleAvatar(
-            radius: scaleWidth(context, 28),
+            radius: scale(context, 28),
             backgroundImage: NetworkImage(avatarUrl),
             backgroundColor: AppColors.softElev,
           ),
-          SizedBox(height: scaleHeight(context, 8)),
+          SizedBox(height: scale(context, 8)),
           Text(
             name,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.w700,
-              fontSize: scaleWidth(context, 13),
+              fontSize: scale(context, 13),
               color: AppColors.titleText,
             ),
           ),
-          SizedBox(height: scaleHeight(context, 2)),
+          SizedBox(height: scale(context, 2)),
           Text(
             role,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: scaleWidth(context, 11),
+              fontSize: scale(context, 11),
               color: AppColors.mutedText,
             ),
           ),
           Spacer(),
           SizedBox(
             width: double.infinity,
-            height: scaleHeight(context, 32),
+            height: scale(context, 32),
             child: OutlinedButton(
-              onPressed: () {},
+              onPressed: onConnect,
               style: OutlinedButton.styleFrom(
                 backgroundColor: AppColors.background,
-                side: BorderSide(color: AppColors.outline),
+                side: BorderSide(color: Colors.black),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(scaleWidth(context, 10)),
+                  borderRadius: BorderRadius.circular(scale(context, 10)),
                 ),
-                padding: EdgeInsets.symmetric(vertical: scaleHeight(context, 6)),
+                padding: EdgeInsets.symmetric(vertical: scale(context, 6)),
               ),
               child: Text(
                 'Connect',
                 style: TextStyle(
-                  color: AppColors.primary,
+                  color: Colors.black,
                   fontWeight: FontWeight.w700,
-                  fontSize: scaleWidth(context, 12),
+                  fontSize: scale(context, 12),
                 ),
               ),
             ),
@@ -577,12 +810,20 @@ class InvestorCard extends StatelessWidget {
   }
 }
 
-// -------------------- Greeting --------------------
 String getGreeting() {
   final now = DateTime.now();
   final hour = now.hour;
-  if (hour < 12) return "Good Morning";
-  if (hour < 15) return "Good Afternoon";
-  if (hour < 20) return "Good Evening";
-  return "Good Night";
+  final minute = now.minute;
+
+  if (hour < 12 || (hour == 11 && minute <= 59)) {
+    return "Good Morning";
+  } else if ((hour == 12 || hour < 15) || (hour == 15 && minute <= 30)) {
+    return "Good Afternoon";
+  } else if ((hour > 15 && hour < 20) ||
+      (hour == 15 && minute > 30) ||
+      (hour == 20 && minute <= 30)) {
+    return "Good Evening";
+  } else {
+    return "Good Night";
+  }
 }

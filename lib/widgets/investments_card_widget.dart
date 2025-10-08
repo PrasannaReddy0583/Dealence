@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:striv/entites/investments_entites.dart';
-import 'package:striv/utils/app_palette.dart';
-import 'package:striv/pages/investor/investor_home_page.dart'; // for scaleWidth/scaleHeight and StatColumn
+import 'package:striv/pages/entrepreneur/home_page.dart';
+// import 'package:striv/utils/app_palette.dart';
+// for scaleWidth/scaleHeight and StatColumn
 
 class InvestmentsCardWidget extends StatelessWidget {
   final InvestmentsEntites investments;
@@ -9,9 +10,10 @@ class InvestmentsCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double cardWidth = MediaQuery.of(context).size.width * 0.8;
+    double cardWidth = MediaQuery.of(context).size.width * 0.85;
 
     return Container(
+      height: MediaQuery.of(context).size.height*0.95,
       width: cardWidth,
       margin: EdgeInsets.only(right: scaleWidth(context, 16)),
       padding: EdgeInsets.all(scaleWidth(context, 16)),
@@ -164,7 +166,7 @@ class InvestmentsCardWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: scaleWidth(context, 15),
                   fontWeight: FontWeight.w600,
-                  color: AppPalette.black,
+                  color: AppColors.primary,
                 ),
               ),
             ),

@@ -13,8 +13,9 @@ class AppColors {
   static Color mutedText = Color(0xFF757575);
   static Color progressBg = Color(0xFFF5E8DC);
   static Color progressFill = primary;
-  static Color buttonBg = primary;
+  static Color buttonBg = Colors.black;
   static Color outline = Color(0xFFF5E8DC);
+  static Color black = Color(0xFF000000);
 }
 
 // Dynamic scaling based on screen width
@@ -49,6 +50,7 @@ class HomePage extends StatelessWidget {
         body: CustomScrollView(
           slivers: [
             SliverAppBar(
+              toolbarHeight: 60,
               surfaceTintColor: AppPalette.transparent,
               floating: true,
               snap: true,

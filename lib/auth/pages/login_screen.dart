@@ -3,7 +3,6 @@ import 'package:striv/auth/pages/signupscreen.dart';
 import 'package:striv/auth/services/auth_service.dart';
 import 'package:striv/auth/widgets/auth_slider.dart';
 import 'package:striv/constants.dart';
-import 'package:striv/pages/navigation.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -176,12 +175,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (!mounted) return;
 
                           if (success.isNotEmpty) {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const Navigation(),
-                              ),
-                            );
+                            // Navigator.pushReplacement(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (_) => const Navigation(),
+                            //   ),
+                            // );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:striv/auth/pages/role_selection_screen.dart';
 import 'package:striv/auth/widgets/auth_slider.dart';
 import 'package:striv/constants.dart';
 import 'package:striv/core/helpers/account_password_rule.dart';
-import 'package:striv/pages/navigation.dart';
 import 'package:striv/terms_and_conditions.dart';
 
 class CreateAccountScreen extends StatefulWidget {
@@ -256,12 +256,12 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         //       VerifyEmailDialog(email: _emailController.text),
                         // );
 
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => Navigation(),
-                          ),
-                        );
+                        Navigator.pushAndRemoveUntil(
+  context,
+  CupertinoPageRoute(builder: (context) => RoleSelectionScreen()),
+  (Route<dynamic> route) => false,
+);
+
 
                         // try {
                         //   await AuthService().signup(
