@@ -115,6 +115,7 @@ class _DiscoverPageState extends State<DiscoverPage>
           return [
             SliverAppBar(
               surfaceTintColor: Colors.transparent,
+              toolbarHeight: 90,
               title: const Text(
                 "Discover",
                 style: TextStyle(
@@ -134,6 +135,7 @@ class _DiscoverPageState extends State<DiscoverPage>
                   icon: const Icon(
                     CupertinoIcons.color_filter,
                     color: AppPalette.black,
+                    size: 30,
                   ),
                   onPressed: () {
                     Navigator.push(
@@ -191,7 +193,7 @@ class _DiscoverPageState extends State<DiscoverPage>
                           : const BouncingScrollPhysics(),
                       labelColor: AppPalette.black,
                       unselectedLabelColor: Colors.grey,
-                      indicatorColor: Colors.greenAccent,
+                      indicatorColor: Colors.black,
                       tabs: filterTabs.map((t) => Tab(text: t)).toList(),
                       indicatorSize: TabBarIndicatorSize.tab,
                     ),

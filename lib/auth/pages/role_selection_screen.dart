@@ -1,5 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:striv/pages/entrepreneur/home_page.dart' hide AppColors;
+import 'package:striv/pages/navigation.dart';
 import 'package:striv/utils/app_theme.dart';
 // import 'package:dealence/entrepreneur_profile_setup_screen.dart';
 // import 'package:dealence/investor_profile_setup_screen.dart';
@@ -46,11 +47,10 @@ class RoleSelectionScreen extends StatelessWidget {
                   title: 'I\'m an Entrepreneur',
                   description: 'Seeking funding for my innovative startup.',
                   onTap: () {
-                    Navigator.push(
+                    Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => HomePage(isInvestor: false),
-                      ),
+  CupertinoPageRoute(builder: (context) => Navigation()),
+  (Route<dynamic> route) => false,
                     );
                   },
                 ),
@@ -61,11 +61,10 @@ class RoleSelectionScreen extends StatelessWidget {
                   title: 'I\'m an Investor',
                   description: 'Looking to find and fund promising ventures.',
                   onTap: () {
-                    Navigator.push(
+                    Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => HomePage(isInvestor: true),
-                      ),
+  CupertinoPageRoute(builder: (context) => Navigation()),
+  (Route<dynamic> route) => false,
                     );
                   },
                 ),

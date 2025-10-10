@@ -11,25 +11,25 @@ class TinderCardsWidget extends StatefulWidget {
 class _TinderCardsWidgetState extends State<TinderCardsWidget> {
   List<Map<String, String>> startups = [
     {
-      "name": "Meth Labs",
+      "name": "Solar Labs",
       // "username": "JessyPinkmen@505",
       "image": "https://picsum.photos/400/600?random=1",
       "desc": "Green energy startup focusing on solar innovation.",
-      "funding": "\$250k for 10% equity",
+      "funding": "₹250k for 10% equity",
     },
     {
       "name": "Healthify",
       // "username": "Heisenberg@644",
       "image": "https://picsum.photos/400/600?random=2",
       "desc": "AI-driven health diagnostics platform.",
-      "funding": "\$500k for 15% equity",
+      "funding": "₹500k for 15% equity",
     },
     {
       "name": "FoodChain",
       // "username": "Dexter@644",
       "image": "https://picsum.photos/400/600?random=3",
       "desc": "Farm-to-table blockchain solution.",
-      "funding": "\$150k for 8% equity",
+      "funding": "₹150k for 8% equity",
     },
   ];
 

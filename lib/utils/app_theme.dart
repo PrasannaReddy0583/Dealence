@@ -9,6 +9,7 @@ class AppColors {
   static const Color accent = Color(0xFFEAD2BD);
   static const Color gold = Color(0xFFE8B430);
   static const Color textBody = Color(0xFF6D635A);
+  static const Color black = Colors.black;
 }
 
 class AppTextStyles {
